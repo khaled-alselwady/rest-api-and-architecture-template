@@ -1,0 +1,6 @@
+@StudyCenterRESTfulAPI_HostAddress = http://localhost:5087
+
+GET {{StudyCenterRESTfulAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
