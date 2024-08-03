@@ -74,19 +74,19 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsEducationLevel"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsEducationLevel"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure EducationLevelID is valid if in Update mode
-            idCheck: el => (el.Mode != enMode.Update) || clsValidationHelper.HasValue(el.EducationLevelID),
+            idCheck: el => (el.Mode != enMode.Update) || ValidationHelper.HasValue(el.EducationLevelID),
 
             // Value Check: Ensure LevelName is not empty
             valueCheck: el => !string.IsNullOrWhiteSpace(el.LevelName),
@@ -95,7 +95,7 @@ namespace StudyCenterBusiness
             additionalChecks: new (Func<clsEducationLevel, bool>, string)[]
             {
                 (el => (el.Mode != enMode.AddNew && _oldLevelName.Trim().ToLower() == el.LevelName.Trim().ToLower()) ||
-                      !clsValidationHelper.ExistsInDatabase(() => Exists(el.LevelName)),
+                      !ValidationHelper.ExistsInDatabase(() => Exists(el.LevelName)),
                       "Education level name already exists.")
             }
             );

@@ -74,19 +74,19 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsGradeLevel"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsGradeLevel"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure GradeLevelID is valid if in Update mode
-            idCheck: gl => (gl.Mode != enMode.Update) || clsValidationHelper.HasValue(gl.GradeLevelID),
+            idCheck: gl => (gl.Mode != enMode.Update) || ValidationHelper.HasValue(gl.GradeLevelID),
 
             // Value Check: Ensure GradeName is not empty
             valueCheck: gl => !string.IsNullOrWhiteSpace(gl.GradeName),
@@ -95,7 +95,7 @@ namespace StudyCenterBusiness
             additionalChecks: new (Func<clsGradeLevel, bool>, string)[]
             {
                 (gl => (gl.Mode != enMode.AddNew && _oldGradeName.Trim().ToLower() == gl.GradeName.Trim().ToLower()) ||
-                      !clsValidationHelper.ExistsInDatabase(() => Exists(gl.GradeName)),
+                      !ValidationHelper.ExistsInDatabase(() => Exists(gl.GradeName)),
                       "Grade name already exists.")
             }
             );

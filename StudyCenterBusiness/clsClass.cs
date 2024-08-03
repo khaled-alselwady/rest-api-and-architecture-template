@@ -86,19 +86,19 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsClass"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsClass"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure ClassID is valid if in Update mode
-            idCheck: c => (c.Mode != enMode.Update) || clsValidationHelper.HasValue(c.ClassID),
+            idCheck: c => (c.Mode != enMode.Update) || ValidationHelper.HasValue(c.ClassID),
 
             // Value Check: Ensure ClassName is not empty and Capacity is positive
             valueCheck: c => !string.IsNullOrWhiteSpace(c.ClassName) &&
@@ -108,7 +108,7 @@ namespace StudyCenterBusiness
             additionalChecks: new (Func<clsClass, bool>, string)[]
             {
                 (c => (c.Mode != enMode.AddNew && _oldClassName.Trim().ToLower() == c.ClassName.Trim().ToLower()) ||
-                      !clsValidationHelper.ExistsInDatabase(() => Exists(c.ClassName)),
+                      !ValidationHelper.ExistsInDatabase(() => Exists(c.ClassName)),
                       "Class name already exists.")
             }
             );

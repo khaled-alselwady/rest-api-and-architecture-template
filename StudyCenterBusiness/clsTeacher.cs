@@ -99,35 +99,35 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsTeacher"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsTeacher"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure TeacherID is valid if in Update mode
-            idCheck: teacher => (Mode != enMode.Update || clsValidationHelper.HasValue(teacher.TeacherID)),
+            idCheck: teacher => (Mode != enMode.Update || ValidationHelper.HasValue(teacher.TeacherID)),
 
             // Value Check: Ensure PersonID, EducationLevelID, and CreatedByUserID are provided
-            valueCheck: teacher => clsValidationHelper.HasValue(teacher.PersonID) &&
-                       clsValidationHelper.HasValue(teacher.EducationLevelID) &&
-                       clsValidationHelper.HasValue(teacher.CreatedByUserID),
+            valueCheck: teacher => ValidationHelper.HasValue(teacher.PersonID) &&
+                       ValidationHelper.HasValue(teacher.EducationLevelID) &&
+                       ValidationHelper.HasValue(teacher.CreatedByUserID),
 
             // Date Check: Ensure CreationDate is valid if in AddNew mode
             dateCheck: teacher => Mode != enMode.AddNew ||
-                       clsValidationHelper.DateIsNotValid(teacher.CreationDate, DateTime.Now),
+                       ValidationHelper.DateIsNotValid(teacher.CreationDate, DateTime.Now),
 
             // Additional Checks: Check various conditions and provide corresponding error messages
             additionalChecks: new (Func<clsTeacher, bool>, string)[]
             {
                 // Check if PersonID already exists as a teacher, considering mode and previous value
                 (teacher => (Mode != enMode.AddNew && _oldPersonID == teacher.PersonID) ||
-                            !clsValidationHelper.ExistsInDatabase(() => IsTeacher(teacher.PersonID)),
+                            !ValidationHelper.ExistsInDatabase(() => IsTeacher(teacher.PersonID)),
                             "Teacher already exists."),
             }
             );

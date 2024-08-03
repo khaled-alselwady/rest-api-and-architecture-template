@@ -73,34 +73,34 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsSubjectTeacher"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsSubjectTeacher"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure SubjectTeacherID is valid if in Update mode
-            idCheck: subjectTeacher => (Mode != enMode.Update || clsValidationHelper.HasValue(subjectTeacher.SubjectTeacherID)),
+            idCheck: subjectTeacher => (Mode != enMode.Update || ValidationHelper.HasValue(subjectTeacher.SubjectTeacherID)),
 
             // Value Check: Ensure SubjectGradeLevelID and TeacherID are provided
-            valueCheck: subjectTeacher => clsValidationHelper.HasValue(subjectTeacher.SubjectGradeLevelID) &&
-                                          clsValidationHelper.HasValue(subjectTeacher.TeacherID),
+            valueCheck: subjectTeacher => ValidationHelper.HasValue(subjectTeacher.SubjectGradeLevelID) &&
+                                          ValidationHelper.HasValue(subjectTeacher.TeacherID),
 
             // Date Check: Ensure AssignmentDate is valid if in AddNew mode
             dateCheck: subjectTeacher => Mode != enMode.AddNew ||
-                       clsValidationHelper.DateIsNotValid(subjectTeacher.AssignmentDate, DateTime.Now),
+                       ValidationHelper.DateIsNotValid(subjectTeacher.AssignmentDate, DateTime.Now),
 
             // Additional Checks: Check various conditions and provide corresponding error messages
             additionalChecks: new (Func<clsSubjectTeacher, bool>, string)[]
             {
                 // Check if AssignmentDate is not after LastModifiedDate in Update mode
                 (subjectTeacher => !(Mode == enMode.Update && subjectTeacher.LastModifiedDate.HasValue &&
-                                !clsValidationHelper.DateIsNotValid(subjectTeacher.AssignmentDate, subjectTeacher.LastModifiedDate.Value)),
+                                !ValidationHelper.DateIsNotValid(subjectTeacher.AssignmentDate, subjectTeacher.LastModifiedDate.Value)),
                                 "Assignment date cannot be after the last modified date.")
             }
             );

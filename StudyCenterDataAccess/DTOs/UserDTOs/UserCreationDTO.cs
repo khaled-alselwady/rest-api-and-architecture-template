@@ -1,4 +1,4 @@
 ﻿namespace StudyCenterDataAccess.DTOs.UserDTOs
 {
-    public record UserCreationDTO(int? PersonID, string Username, string Password, int Permissions, bool IsActive);
+    public record UserCreationDto(int? PersonID, string Username, string Password, int Permissions, bool IsActive);
 }

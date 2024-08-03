@@ -92,34 +92,34 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsStudent"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsStudent"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure StudentID is valid if in Update mode
-            idCheck: student => (Mode != enMode.Update || clsValidationHelper.HasValue(student.StudentID)),
+            idCheck: student => (Mode != enMode.Update || ValidationHelper.HasValue(student.StudentID)),
 
             // Value Check: Ensure required properties are not null
-            valueCheck: student => clsValidationHelper.HasValue(student.PersonID) &&
-                                   clsValidationHelper.HasValue(student.GradeLevelID) &&
-                                   clsValidationHelper.HasValue(student.CreatedByUserID),
+            valueCheck: student => ValidationHelper.HasValue(student.PersonID) &&
+                                   ValidationHelper.HasValue(student.GradeLevelID) &&
+                                   ValidationHelper.HasValue(student.CreatedByUserID),
 
             // Date Check: Ensure CreationDate is not in the future if in AddNew mode
             dateCheck: student => Mode != enMode.AddNew ||
-                                 clsValidationHelper.DateIsNotValid(student.CreationDate, DateTime.Now),
+                                 ValidationHelper.DateIsNotValid(student.CreationDate, DateTime.Now),
 
             // Additional Checks: Ensure no duplicate student
             additionalChecks: new (Func<clsStudent, bool>, string)[]
             {
                 (student => (Mode != enMode.AddNew && _oldPersonID == student.PersonID) ||
-                            !clsValidationHelper.ExistsInDatabase(() => IsStudent(student.PersonID)),
+                            !ValidationHelper.ExistsInDatabase(() => IsStudent(student.PersonID)),
                             "Student already exists."),
             }
             );

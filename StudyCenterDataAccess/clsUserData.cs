@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using StudyCenterDataAccess.DTOs.UserDTOs;
+using StudyCenterSharedDTOs.UserDTOs;
 using System.Data;
 
 
@@ -7,16 +8,16 @@ namespace StudyCenterDataAccess
 {
     public class clsUserData
     {
-        public static UserDTO? GetUserInfoByUserID(int? userID)
-            => clsDataAccessHelper.GetBy("SP_GetUserInfoByID", userID, "UserID", Mappings.MapToUserDto);
+        public static UserDetailsDto? GetUserInfoByUserID(int? userID)
+            => clsDataAccessHelper.GetBy("SP_GetUserInfoByID", "UserID", userID, Mappings.MapToUserDetailsDto);
 
-        public static UserDTO? GetUserInfoByPersonID(int? personID)
-            => clsDataAccessHelper.GetBy("SP_GetUserInfoByPersonID", personID, "PersonID", Mappings.MapToUserDto);
+        public static UserDetailsDto? GetUserInfoByPersonID(int? personID)
+            => clsDataAccessHelper.GetBy("SP_GetUserInfoByPersonID", "PersonID", personID, Mappings.MapToUserDetailsDto);
 
-        public static UserDTO? GetUserInfoByUsername(string username)
-            => clsDataAccessHelper.GetBy("SP_GetUserInfoByUsername", username, "Username", Mappings.MapToUserDto);
+        public static UserDetailsDto? GetUserInfoByUsername(string username)
+            => clsDataAccessHelper.GetBy("SP_GetUserInfoByUsername", "Username", username, Mappings.MapToUserDetailsDto);
 
-        public static UserDTO? GetUserInfoByUsernameAndPassword(string username, string password)
+        public static UserDetailsDto? GetUserInfoByUsernameAndPassword(string username, string password)
         {
             var parameters = new (string name, object? value)[]
             {
@@ -24,13 +25,13 @@ namespace StudyCenterDataAccess
                 (name: "Password", value: password)
             };
 
-            return clsDataAccessHelper.GetBy("SP_GetUserInfoByUsernameAndPassword", parameters, Mappings.MapToUserDto);
+            return clsDataAccessHelper.GetBy("SP_GetUserInfoByUsernameAndPassword", parameters, Mappings.MapToUserDetailsDto);
         }
 
-        public static int? Add(UserCreationDTO userDto)
-           => clsDataAccessHelper.Add("SP_AddNewUser", "@NewUserID", userDto);
+        public static int? Add(UserCreationDto userDto)
+           => clsDataAccessHelper.Add("SP_AddNewUser", "NewUserID", userDto);
 
-        public static bool Update(UserDTO userDto)
+        public static bool Update(UserDto userDto)
             => clsDataAccessHelper.Update("SP_UpdateUser", userDto);
 
         public static bool Delete(int? userID)
@@ -48,10 +49,7 @@ namespace StudyCenterDataAccess
         public static bool ExistsByUsernameAndPassword(string username, string password)
             => clsDataAccessHelper.Exists("SP_DoesUserExistByUsernameAndPassword", "Username", username, "Password", password);
 
-        public static DataTable All()
-            => clsDataAccessHelper.All("SP_GetAllUsers");
-
-        public static List<UserViewDTO> AllUsers()
+        public static List<UserViewDto> AllUsers()
             => clsDataAccessHelper.All("Sp_GetAllUsers", Mappings.MapToUserViewDto);
 
         public static int Count()

@@ -2,7 +2,6 @@
 using StudyCenterDataAccess.DTOs.UserDTOs;
 using static StudyCenterBusiness.clsUser;
 
-
 namespace StudyCenterBusiness.UserFinders
 {
     public class UsernameFinder : IUserFinder
@@ -11,7 +10,7 @@ namespace StudyCenterBusiness.UserFinders
         {
             if (data is string username)
             {
-                UserDTO? UserDTO = clsUserData.GetUserInfoByUsername(username);
+                UserDto? UserDTO = clsUserData.GetUserInfoByUsername(username);
 
                 return (UserDTO != null) ? (new clsUser(UserDTO, enMode.Update)) : null;
             }

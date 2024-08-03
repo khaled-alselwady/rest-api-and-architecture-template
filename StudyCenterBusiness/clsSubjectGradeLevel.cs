@@ -106,23 +106,23 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsSubjectGradeLevel"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsSubjectGradeLevel"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure SubjectGradeLevelID is valid if in Update mode
-            idCheck: sgl => (Mode != enMode.Update || clsValidationHelper.HasValue(sgl.SubjectGradeLevelID)),
+            idCheck: sgl => (Mode != enMode.Update || ValidationHelper.HasValue(sgl.SubjectGradeLevelID)),
 
             // Value Check: Ensure SubjectID and GradeLevelID are provided, and Fees is non-negative
-            valueCheck: sgl => clsValidationHelper.HasValue(sgl.SubjectID) &&
-                               clsValidationHelper.HasValue(sgl.GradeLevelID) &&
+            valueCheck: sgl => ValidationHelper.HasValue(sgl.SubjectID) &&
+                               ValidationHelper.HasValue(sgl.GradeLevelID) &&
                                sgl.Fees >= 0,
 
 
@@ -131,7 +131,7 @@ namespace StudyCenterBusiness
             {
                 // Check if the combination of SubjectID and GradeLevelID already exists in the database
                 ((sgl) => !((Mode == enMode.AddNew || sgl._oldSubjectID != sgl._subjectID || sgl._oldGradeLevelID != sgl._gradeLevelID) &&
-                          clsValidationHelper.ExistsInDatabase(() => Exists(sgl.SubjectID, sgl.GradeLevelID))),
+                          ValidationHelper.ExistsInDatabase(() => Exists(sgl.SubjectID, sgl.GradeLevelID))),
                           "Subject grade level already exists."),
             }
             );

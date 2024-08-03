@@ -11,7 +11,7 @@ namespace StudyCenterBusiness.UserFinders
         {
             if (data is (string username, string password))
             {
-                UserDTO? UserDTO = clsUserData.GetUserInfoByUsernameAndPassword(username, password);
+                UserDto? UserDTO = clsUserData.GetUserInfoByUsernameAndPassword(username, password);
 
                 return (UserDTO != null) ? (new clsUser(UserDTO, enMode.Update)) : null;
             }

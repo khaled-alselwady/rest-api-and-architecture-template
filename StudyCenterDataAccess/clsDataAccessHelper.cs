@@ -417,7 +417,7 @@ namespace StudyCenterDataAccess
             return dt;
         }
 
-        public static T? GetBy<T>(string storedProcedureName, object? value, string parameterName, Func<IDataRecord, T> mapFunction)
+        public static T? GetBy<T>(string storedProcedureName, string parameterName, object? value, Func<IDataRecord, T> mapFunction)
         {
             try
             {
@@ -545,7 +545,7 @@ namespace StudyCenterDataAccess
                         var inputParameters = _CreateInputParameters(entity);
                         _AddInputParametersToSqlCommand(command, inputParameters);
 
-                        SqlParameter outputIdParam = _CreateOutputParameter(outputParameterName);
+                        SqlParameter outputIdParam = _CreateOutputParameter($"@{outputParameterName}");
                         command.Parameters.Add(outputIdParam);
 
                         connection.Open();

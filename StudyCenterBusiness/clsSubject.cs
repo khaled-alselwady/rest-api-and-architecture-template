@@ -74,29 +74,29 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsSubject"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsSubject"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure SubjectID is valid if in Update mode
-            idCheck: subject => (Mode != enMode.Update || clsValidationHelper.HasValue(subject.SubjectID)),
+            idCheck: subject => (Mode != enMode.Update || ValidationHelper.HasValue(subject.SubjectID)),
 
             // Value Check: Ensure SubjectName is not empty
-            valueCheck: subject => clsValidationHelper.IsNotEmpty(subject.SubjectName),
+            valueCheck: subject => ValidationHelper.IsNotEmpty(subject.SubjectName),
 
             // Additional Checks: Check various conditions and provide corresponding error messages
             additionalChecks: new (Func<clsSubject, bool>, string)[]
             {
                 // Check if the SubjectName already exists in the database
                 ((subject) => (Mode != enMode.AddNew && _oldSubjectName.Trim().ToLower() != subject.SubjectName.Trim().ToLower()) ||
-                              !clsValidationHelper.ExistsInDatabase(() => Exists(subject.SubjectName)),
+                              !ValidationHelper.ExistsInDatabase(() => Exists(subject.SubjectName)),
                               "Subject name already exists.")
             }
             );

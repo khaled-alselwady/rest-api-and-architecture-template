@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyCenterBusiness;
 using StudyCenterDataAccess.DTOs.UserDTOs;
+using StudyCenterSharedDTOs.UserDTOs;
 
 namespace StudyCenterRESTfulAPI.Controllers
 {
@@ -11,9 +12,9 @@ namespace StudyCenterRESTfulAPI.Controllers
         [HttpGet("all", Name = "GetAllUsers")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<UserViewDTO>> GetAllUsers()
+        public ActionResult<IEnumerable<UserViewDto>> GetAllUsers()
         {
-            List<UserViewDTO> users = clsUser.All();
+            List<UserViewDto> users = clsUser.All();
 
             if (users == null || users.Count == 0)
             {
@@ -27,7 +28,7 @@ namespace StudyCenterRESTfulAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<UserDTO> GetUserById(int userId)
+        public ActionResult<UserDetailsDto> GetUserById(int userId)
         {
             if (userId < 1)
             {
@@ -41,14 +42,14 @@ namespace StudyCenterRESTfulAPI.Controllers
                 return NotFound($"User with ID {userId} is not found.");
             }
 
-            return Ok(user.UserDto);
+            return Ok(user.ToUserDetailsDto());
         }
 
         [HttpGet("person/{personId}", Name = "GetUserByPersonId")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<UserDTO> GetUserByPersonId(int personId)
+        public ActionResult<UserDetailsDto> GetUserByPersonId(int personId)
         {
             if (personId < 1)
             {
@@ -62,14 +63,14 @@ namespace StudyCenterRESTfulAPI.Controllers
                 return NotFound($"User with ID {personId} is not found.");
             }
 
-            return Ok(user.UserDto);
+            return Ok(user.ToUserDetailsDto());
         }
 
         [HttpGet("username", Name = "GetUserByUsername")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<UserDTO> GetUserByUsername(string username)
+        public ActionResult<UserDetailsDto> GetUserByUsername(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -83,14 +84,14 @@ namespace StudyCenterRESTfulAPI.Controllers
                 return NotFound($"User with username {username} is not found.");
             }
 
-            return Ok(user.UserDto);
+            return Ok(user.ToUserDetailsDto());
         }
 
         [HttpGet("username-password", Name = "GetUserByUsernameAndPassword")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<UserDTO> GetUserByPersonId(string username, string password)
+        public ActionResult<UserDetailsDto> GetUserByUsernameAndPassword(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -104,37 +105,43 @@ namespace StudyCenterRESTfulAPI.Controllers
                 return NotFound($"User with this username/password is not found.");
             }
 
-            return Ok(user.UserDto);
+            return Ok(user.ToUserDetailsDto());
         }
 
         [HttpPost("", Name = "AddNewUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<UserDTO> AddUser(UserCreationDTO newUser)
+        public ActionResult<UserDto> AddUser(UserCreationDto newUser)
         {
             if (newUser == null)
             {
                 return BadRequest($"Not accepted data");
             }
 
-            clsUser user = new clsUser(new UserDTO(null, newUser.PersonID, newUser.Username, newUser.Password, newUser.Permissions, newUser.IsActive));
+            clsUser user = new clsUser(new UserDto(null, newUser.PersonID, newUser.Username, newUser.Password, newUser.Permissions, newUser.IsActive));
 
-            if (user.Save())
+            if (user.TryToSave(out bool isValidationError))
             {
-                return CreatedAtRoute("GetUserById", new { id = user.UserID }, user.UserDto);
+                return CreatedAtRoute("GetUserById", new { userId = user.UserID }, user.ToUserDto());
             }
             else
             {
-                return StatusCode(500, new { message = "Error adding user" });
+                return (isValidationError)
+                    ?
+                    BadRequest($"Missing data!")
+                    :
+                    StatusCode(500, new { message = "Error adding user" });
             }
+
         }
 
         [HttpPut("{userId}", Name = "UpdateUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<UserDTO> UpdateUser(int userId, UserDTO updatedUser)
+        public ActionResult<UserDto> UpdateUser(int userId, UserDto updatedUser)
         {
             if (updatedUser == null || userId < 1)
             {
@@ -154,19 +161,24 @@ namespace StudyCenterRESTfulAPI.Controllers
             user.Permissions = updatedUser.Permissions;
             user.IsActive = updatedUser.IsActive;
 
-            if (user.Save())
+            if (user.TryToSave(out bool isValidationError))
             {
-                return Ok(user.UserDto);
+                return Ok(user.ToUserDto());
             }
             else
             {
-                return StatusCode(500, new { message = "Error updating user" });
+                return (isValidationError)
+                    ?
+                    BadRequest($"Missing data!")
+                    :
+                    StatusCode(500, new { message = "Error updating user" });
             }
         }
 
         [HttpDelete("{userId}", Name = "DeleteUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult DeleteUser(int userId)
         {
@@ -175,13 +187,20 @@ namespace StudyCenterRESTfulAPI.Controllers
                 return BadRequest($"Not accepted ID {userId}");
             }
 
-            if (clsUser.Delete(userId))
+            if (clsUser.Exists(userId, clsUser.enFindBy.UserID))
             {
-                return Ok($"User with ID {userId} has been deleted.");
+                if (clsUser.Delete(userId))
+                {
+                    return Ok($"User with ID {userId} has been deleted.");
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Error deleting user" });
+                }
             }
             else
             {
-                return NotFound($"User with ID {userId} not found. no rows deleted!");
+                return NotFound($"Person with ID {userId} not found. no rows deleted!");
             }
         }
 
@@ -276,7 +295,7 @@ namespace StudyCenterRESTfulAPI.Controllers
             return Ok(clsUser.Count());
         }
 
-        [HttpGet("change-password", Name = "ChangePassword")]
+        [HttpPut("change-password", Name = "ChangePassword")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -298,6 +317,8 @@ namespace StudyCenterRESTfulAPI.Controllers
         }
 
         [HttpGet("get-permissions-list", Name = "GetPermissionsText")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<string>> GetPermissionsText(int permissionUser)
         {
             List<string> permissions = clsUser.GetPermissionsText(permissionUser);

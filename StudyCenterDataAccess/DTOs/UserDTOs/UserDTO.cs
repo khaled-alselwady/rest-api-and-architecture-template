@@ -1,6 +1,6 @@
 ﻿namespace StudyCenterDataAccess.DTOs.UserDTOs
 {
-    //public class UserDTO
+    //public record UserDto
     //{
     //    public int? UserID { get; set; }
     //    public int? PersonID { get; set; }
@@ -9,7 +9,7 @@
     //    public int Permissions { get; set; }
     //    public bool IsActive { get; set; }
 
-    //    public UserDTO(int? userID, int? personID, string username, string password, int permissions, bool isActive)
+    //    public UserDto(int? userID, int? personID, string username, string password, int permissions, bool isActive)
     //    {
     //        UserID = userID;
     //        PersonID = personID;
@@ -20,5 +20,5 @@
     //    }
     //}
 
-    public record UserDTO(int? UserID, int? PersonID, string Username, string Password, int Permissions, bool IsActive);
+    public record UserDto(int? UserID, int? PersonID, string Username, string Password, int Permissions, bool IsActive);
 }

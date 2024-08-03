@@ -10,7 +10,7 @@ namespace StudyCenterBusiness.UserFinders
         {
             if (data is int userId)
             {
-                UserDTO? UserDTO = clsUserData.GetUserInfoByUserID(userId);
+                UserDto? UserDTO = clsUserData.GetUserInfoByUserID(userId);
 
                 return (UserDTO != null) ? (new clsUser(UserDTO, enMode.Update)) : null;
             }

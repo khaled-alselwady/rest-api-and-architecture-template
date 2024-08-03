@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyCenterDataAccess", "StudyCenterDataAccess\StudyCenterDataAccess.csproj", "{100AD40E-3797-4CC6-8F69-D5094F27E6D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyCenterDataAccess", "StudyCenterDataAccess\StudyCenterDataAccess.csproj", "{100AD40E-3797-4CC6-8F69-D5094F27E6D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyCenterBusiness", "StudyCenterBusiness\StudyCenterBusiness.csproj", "{2FF801FD-454A-420E-80B1-CBAA895CA7E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyCenterBusiness", "StudyCenterBusiness\StudyCenterBusiness.csproj", "{2FF801FD-454A-420E-80B1-CBAA895CA7E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyCenterRESTfulAPI", "StudyCenterRESTfulAPI\StudyCenterRESTfulAPI.csproj", "{11D2CCD8-57E7-4927-9394-75B271D99CC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyCenterRESTfulAPI", "StudyCenterRESTfulAPI\StudyCenterRESTfulAPI.csproj", "{11D2CCD8-57E7-4927-9394-75B271D99CC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

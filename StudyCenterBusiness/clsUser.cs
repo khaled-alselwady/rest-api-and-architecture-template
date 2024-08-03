@@ -2,17 +2,12 @@ using StudyCenterBusiness.UserExistenceVerifiers;
 using StudyCenterBusiness.UserFinders;
 using StudyCenterDataAccess;
 using StudyCenterDataAccess.DTOs.UserDTOs;
+using StudyCenterSharedDTOs.UserDTOs;
 
 namespace StudyCenterBusiness
 {
     public class clsUser
     {
-        public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
-
-        public UserDTO UserDto => new UserDTO(this.UserID, this.PersonID, this.Username, this.Password, this.Permissions, this.IsActive);
-        public UserViewDTO UserViewDto => new UserViewDTO(this.UserID, this.PersonInfo.FullName, this.Username, this.PersonInfo.GenderName, this.IsActive);
-
         public enum enFindBy
         {
             UserID,
@@ -20,7 +15,6 @@ namespace StudyCenterBusiness
             Username,
             UsernameAndPassword
         };
-
         public enum enPermissions
         {
             All = -1,
@@ -29,6 +23,8 @@ namespace StudyCenterBusiness
             DeleteUser = 4,
             ListUsers = 8
         }
+        public enum enMode { AddNew = 0, Update = 1 };
+        public enMode Mode = enMode.AddNew;
 
         public int? UserID { get; set; }
 
@@ -72,21 +68,13 @@ namespace StudyCenterBusiness
         public int Permissions { get; set; }
         public bool IsActive { get; set; }
 
-        public clsPerson PersonInfo { get; private set; }
+        public UserDto ToUserDto() => new UserDto(this.UserID, this.PersonID, this.Username, this.Password, this.Permissions, this.IsActive);
+        public UserDetailsDto ToUserDetailsDto() => new UserDetailsDto(this.UserID, this.PersonID, this.Username, this.Password, this.Permissions, this.IsActive);
+        public UserViewDto ToUserViewDto() => new UserViewDto(this.UserID, this.PersonInfo.FullName, this.Username, this.PersonInfo.GenderName, this.IsActive);
 
-        public clsUser()
-        {
-            UserID = null;
-            PersonID = null;
-            Username = string.Empty;
-            Password = string.Empty;
-            Permissions = -1;
-            IsActive = true;
+        public clsPerson? PersonInfo { get; private set; }
 
-            Mode = enMode.AddNew;
-        }
-
-        public clsUser(UserDTO UserDTO, enMode mode = enMode.AddNew)
+        public clsUser(UserDto UserDTO, enMode mode = enMode.AddNew)
         {
             UserID = UserDTO.UserID;
             PersonID = UserDTO.PersonID;
@@ -100,101 +88,61 @@ namespace StudyCenterBusiness
             Mode = mode;
         }
 
-        private bool _Validate()
-        {
-            if (Mode == enMode.Update && !UserID.HasValue)
-            {
-                return false;
-            }
-
-            if (!PersonID.HasValue)
-            {
-                return false;
-            }
-
-            if ((Mode == enMode.AddNew) || _oldPersonID != _personID)
-            {
-                if (Exists(_personID, enFindBy.PersonID))
-                {
-                    return false;
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(_userName))
-            {
-                return false;
-            }
-
-            // If the old username is different from the new username:
-            // - In AddNew Mode: This indicates the new username, requiring validation.
-            // - In Update Mode: This indicates that the username has been changed, so we need to check if it already exists in the database.
-            // If the new username already exists in the database, return false to indicate validation failure.
-            if ((Mode == enMode.AddNew) || (_oldUsername.Trim().ToLower() != _userName.Trim().ToLower()))
-            {
-                if (Exists(_userName, enFindBy.Username))
-                {
-                    return false;
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(Password))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         /// <summary>
-        /// Validates the current instance of <see cref="clsUser"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsUser"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure UserID is valid if in Update mode
-            idCheck: user => (Mode != enMode.Update || clsValidationHelper.HasValue(user.UserID)),
+            idCheck: user => (Mode != enMode.Update || ValidationHelper.HasValue(user.UserID)),
 
             // Value Check: Ensure PersonID is provided
-            valueCheck: user => clsValidationHelper.HasValue(user.PersonID),
+            valueCheck: user => ValidationHelper.HasValue(user.PersonID),
 
             // Additional Checks: Check various conditions and provide corresponding error messages
             additionalChecks: new (Func<clsUser, bool>, string)[]
             {
+                // If the old username is different from the new username:
+                // - In AddNew Mode: This indicates the new username, requiring validation.
+                // - In Update Mode: This indicates that the username has been changed, so we need to check if it already exists in the database.
+                // If the new username already exists in the database, return false to indicate validation failure.
+
                 // Check if PersonID already exists, considering mode and previous value
                 (user => (Mode != enMode.AddNew && _oldPersonID == user.PersonID) ||
-                         !clsValidationHelper.ExistsInDatabase(() => Exists(user.PersonID, enFindBy.PersonID)),
+                         !ValidationHelper.ExistsInDatabase(() => Exists(user.PersonID, enFindBy.PersonID)),
                          "Person already exists."),
 
                 // Check if Username is not empty
-                (user => clsValidationHelper.IsNotEmpty(user.Username), "Username is empty."),
+                (user => ValidationHelper.IsNotEmpty(user.Username), "Username is empty."),
 
                 // Check if Username already exists, considering mode and previous value
                 (user => (Mode != enMode.AddNew && _oldUsername.Trim().ToLower() == user.Username.Trim().ToLower()) ||
-                         !clsValidationHelper.ExistsInDatabase(() => Exists(user.Username, enFindBy.Username)),
+                         !ValidationHelper.ExistsInDatabase(() => Exists(user.Username, enFindBy.Username)),
                          "Username already exists."),
 
                 // Check if Password is not empty
-                (user => clsValidationHelper.IsNotEmpty(user.Password), "Password is empty.")
+                (user => ValidationHelper.IsNotEmpty(user.Password), "Password is empty.")
             }
             );
         }
 
         private bool _Add()
         {
-            UserID = clsUserData.Add(new UserCreationDTO(this.PersonID, this.Username, this.Password, this.Permissions, this.IsActive));
+            UserID = clsUserData.Add(new UserCreationDto(this.PersonID, this.Username, this.Password, this.Permissions, this.IsActive));
 
             return (UserID.HasValue);
         }
 
         private bool _Update()
         {
-            return clsUserData.Update(UserDto);
+            return clsUserData.Update(this.ToUserDto());
         }
 
         public bool Save()
@@ -221,6 +169,38 @@ namespace StudyCenterBusiness
                     return _Update();
             }
 
+            return false;
+        }
+
+        public bool TryToSave(out bool isValidationError)
+        {
+            if (!_ValidateUsingHelperClass())
+            {
+                isValidationError = true;
+                return false;
+            }
+
+            switch (Mode)
+            {
+                case enMode.AddNew:
+                    if (_Add())
+                    {
+                        Mode = enMode.Update;
+                        isValidationError = false;
+                        return true;
+                    }
+                    else
+                    {
+                        isValidationError = false;
+                        return false;
+                    }
+
+                case enMode.Update:
+                    isValidationError = false;
+                    return _Update();
+            }
+
+            isValidationError = false;
             return false;
         }
 
@@ -252,7 +232,7 @@ namespace StudyCenterBusiness
             return (verifier != null) && verifier.Exists((username, password));
         }
 
-        public static List<UserViewDTO> All()
+        public static List<UserViewDto> All()
             => clsUserData.AllUsers();
 
         public static int Count()

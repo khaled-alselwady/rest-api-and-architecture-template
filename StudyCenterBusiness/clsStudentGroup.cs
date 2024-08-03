@@ -76,28 +76,28 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsStudentGroup"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsStudentGroup"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure StudentGroupID is valid if in Update mode
-            idCheck: studentGroup => (Mode != enMode.Update || clsValidationHelper.HasValue(studentGroup.StudentGroupID)),
+            idCheck: studentGroup => (Mode != enMode.Update || ValidationHelper.HasValue(studentGroup.StudentGroupID)),
 
             // Value Check: Ensure required properties are not null
-            valueCheck: studentGroup => clsValidationHelper.HasValue(studentGroup.StudentID) &&
-                            clsValidationHelper.HasValue(studentGroup.GroupID) &&
-                            clsValidationHelper.HasValue(studentGroup.CreatedByUserID),
+            valueCheck: studentGroup => ValidationHelper.HasValue(studentGroup.StudentID) &&
+                            ValidationHelper.HasValue(studentGroup.GroupID) &&
+                            ValidationHelper.HasValue(studentGroup.CreatedByUserID),
 
             // Date Check: Ensure dates are valid
-            dateCheck: studentGroup => (Mode == enMode.AddNew && clsValidationHelper.DateIsNotValid(studentGroup.StartDate, DateTime.Now)) ||
-                                       (Mode == enMode.Update && (!studentGroup.EndDate.HasValue || clsValidationHelper.DateIsNotValid(studentGroup.StartDate, studentGroup.EndDate.Value)))
+            dateCheck: studentGroup => (Mode == enMode.AddNew && ValidationHelper.DateIsNotValid(studentGroup.StartDate, DateTime.Now)) ||
+                                       (Mode == enMode.Update && (!studentGroup.EndDate.HasValue || ValidationHelper.DateIsNotValid(studentGroup.StartDate, studentGroup.EndDate.Value)))
             );
         }
 

@@ -96,19 +96,19 @@ namespace StudyCenterBusiness
         }
 
         /// <summary>
-        /// Validates the current instance of <see cref="clsMeetingTime"/> using the <see cref="clsValidationHelper"/>.
+        /// Validates the current instance of <see cref="clsMeetingTime"/> using the <see cref="ValidationHelper"/>.
         /// </summary>
         /// <returns>
         /// Returns true if the current instance passes all validation checks; otherwise, false.
         /// </returns>
         private bool _ValidateUsingHelperClass()
         {
-            return clsValidationHelper.Validate
+            return ValidationHelper.Validate
             (
             this,
 
             // ID Check: Ensure MeetingTimeID is valid if in Update mode
-            idCheck: mt => (mt.Mode != enMode.Update) || clsValidationHelper.HasValue(mt.MeetingTimeID),
+            idCheck: mt => (mt.Mode != enMode.Update) || ValidationHelper.HasValue(mt.MeetingTimeID),
 
             // Value Check: Ensure StartTime is before EndTime and MeetingDays is within valid range
             valueCheck: mt => mt.StartTime < mt.EndTime && (mt.MeetingDays >= 0 && mt.MeetingDays <= 2),
@@ -117,7 +117,7 @@ namespace StudyCenterBusiness
             additionalChecks: new (Func<clsMeetingTime, bool>, string)[]
             {
                 (mt => (mt.Mode != enMode.AddNew && _oldStartTime == mt.StartTime && _oldMeetingDays == mt.MeetingDays) ||
-                       !clsValidationHelper.ExistsInDatabase(() => Exists(mt.StartTime, mt.MeetingDays)),
+                       !ValidationHelper.ExistsInDatabase(() => Exists(mt.StartTime, mt.MeetingDays)),
                        "Meeting time already exists.")
             }
             );

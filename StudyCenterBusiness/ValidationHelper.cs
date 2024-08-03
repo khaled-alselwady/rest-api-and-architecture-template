@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace StudyCenterBusiness
+﻿namespace StudyCenterBusiness
 {
     /// <summary>
     /// A helper class for performing various validation checks on entities.
     /// </summary>
-    public static class clsValidationHelper
+    public static class ValidationHelper
     {
         /// <summary>
         /// Validates an entity based on the provided validation checks.
